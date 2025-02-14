@@ -73,7 +73,7 @@ function groupMenu(menu) {
         index = groups[groupId].length
         groups[groupId].push({
           uniqueId: groupUniqueId,
-          id: groupId,
+          id: `${groupId}_${index}`,
           addons: product[groupId],
           products: []
         })
