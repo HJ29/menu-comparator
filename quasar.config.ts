@@ -53,7 +53,7 @@ export default defineConfig((/* ctx */) => {
 
       // rebuildCache: true, // rebuilds Vite/linter/etc cache on startup
 
-      // publicPath: '/',
+      publicPath: '/menu-comparator/',
       // analyze: true,
       // env: {},
       // rawDefine: {}
