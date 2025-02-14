@@ -30,7 +30,7 @@ function csvToJson(csv) {
   const rows = csv.split("\n").map(row => row.trim()).filter(row => row);
   const headers = rows.shift().split(",");
   return rows.map(row => {
-    const values = row.split(",");
+    const values = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(item => item.replace(/^"|"$/g, ''));
     return headers.reduce((acc, header, index) => {
       acc[header] = values[index];
       return acc;
@@ -73,13 +73,13 @@ function groupMenu(menu) {
         index = groups[groupId].length
         groups[groupId].push({
           uniqueId: groupUniqueId,
-          id: `${groupId}_${index}`,
+          id: groupId,
+          no: index,
           addons: product[groupId],
           products: []
         })
       }
       groups[groupId][index].products.push(productId);
-      groups[groupId].sort((a, b) => a.uniqueId.localeCompare(b.uniqueId))
     })
     return groups;
   }, {})
@@ -88,14 +88,14 @@ function groupMenu(menu) {
 function compareJson({ newJson, oldJson }: { newJson: string[][]; oldJson: string[][] }) {
   const oldGroups = groupMenu(oldJson)
   const newGroups = groupMenu(newJson)
-  const actions: string[][] = [['status', 'group', 'addons', 'addon count', 'products', 'product count']]
+  const actions: string[][] = [['status', 'group', 'no', 'addons', 'addon count', 'products', 'product count']]
   const remainUniqueIds: string[] = []
   Object.keys(newGroups).forEach(newGroupId => {
     const newGroup = newGroups[newGroupId];
     const oldGroup = oldGroups[newGroupId];
     newGroup.forEach(newUniqueGroup => {
       const existingOldUniqueGroup = oldGroup?.find((oldUniqueGroup) => oldUniqueGroup.uniqueId === newUniqueGroup.uniqueId)
-      const action = [newUniqueGroup.id, `"${newUniqueGroup.addons.join('\n')}"`, newUniqueGroup.addons.length, `"${newUniqueGroup.products.join('\n')}"`, newUniqueGroup.products.length];
+      const action = [newUniqueGroup.id, `${newUniqueGroup.no}`, `"${newUniqueGroup.addons.join('\n')}"`, newUniqueGroup.addons.length, `"${newUniqueGroup.products.join('\n')}"`, newUniqueGroup.products.length];
       if (!existingOldUniqueGroup) {
         action.unshift('UPDATE');
       } else if (!remainUniqueIds.includes(existingOldUniqueGroup.uniqueId)) {
@@ -109,12 +109,12 @@ function compareJson({ newJson, oldJson }: { newJson: string[][]; oldJson: strin
     const oldGroup = oldGroups[oldGroupId];
     oldGroup.forEach(oldUniqueGroup => {
       if (!remainUniqueIds.includes(oldUniqueGroup.uniqueId)) {
-        actions.push(['DELETE', oldUniqueGroup.id, `"${oldUniqueGroup.addons.join('\n')}"`, oldUniqueGroup.addons.length, `"${oldUniqueGroup.products.join('\n')}"`, oldUniqueGroup.products.length])
+        actions.push(['DELETE', oldUniqueGroup.id, oldUniqueGroup.no, `"${oldUniqueGroup.addons.join('\n')}"`, oldUniqueGroup.addons.length, `"${oldUniqueGroup.products.join('\n')}"`, oldUniqueGroup.products.length])
       }
     })
   })
   const actionOrders = ['UPDATE', 'DELETE', 'REMAIN']
-  actions.sort((a, b) => actionOrders.indexOf(`${a[0]}`) - actionOrders.indexOf(`${b[0]}`))
+  actions.sort((a, b) => (actionOrders.indexOf(`${a[0]}`) - actionOrders.indexOf(`${b[0]}`)) || `${a[1]}`.localeCompare(`${b[1]}`) || (Number(a[2]) - Number(b[2])))
   const rows = actions.map(row => Object.values(row).join(",")).join("\n");
   downloadCsvFile(rows)
 }
