@@ -1,8 +1,8 @@
 {
-  "name": "zus-menu-comparator",
+  "name": "menu-comparator",
   "version": "0.0.1",
-  "description": "ZUS menu comparator",
-  "productName": "ZUS Menu Comparator",
+  "description": "menu comparator",
+  "productName": "Menu Comparator",
   "author": "Lim Hong Jian <hongjian@feedme.cc>",
   "type": "module",
   "private": true,
