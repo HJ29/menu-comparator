@@ -1,6 +1,6 @@
-# ZUS Menu Comparator (zus-menu-comparator)
+# Menu Comparator (menu-comparator)
 
-ZUS menu comparator
+menu comparator
 
 ## Install the dependencies
 ```bash
@@ -38,3 +38,4 @@ quasar build
 
 ### Customize the configuration
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+# menu-comparator
